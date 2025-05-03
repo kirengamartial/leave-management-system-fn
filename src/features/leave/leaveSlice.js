@@ -6,33 +6,39 @@ export const applyForLeave = createAsyncThunk(
     async (leaveData, { getState, rejectWithValue }) => {
         try {
             const token = getState().auth.token;
-            let body, headers;
-            if (leaveData.files && leaveData.files.length > 0) {
-                body = new FormData();
-                body.append('leaveType', leaveData.leaveType);
-                body.append('startDate', leaveData.startDate);
-                body.append('endDate', leaveData.endDate);
-                body.append('reason', leaveData.reason);
-                leaveData.files.forEach((file, idx) => {
-                    body.append('supportingDocuments', file);
-                });
-                headers = { Authorization: `Bearer ${token}` };
-            } else {
-                body = JSON.stringify({
-                    leaveType: leaveData.leaveType,
-                    startDate: leaveData.startDate,
-                    endDate: leaveData.endDate,
-                    reason: leaveData.reason,
-                });
-                headers = {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                };
+            const formData = new FormData();
+
+            const formatDate = (date) => {
+                const d = new Date(date);
+                const pad = (n) => n < 10 ? '0' + n : n;
+                return (
+                    d.getFullYear() +
+                    '-' + pad(d.getMonth() + 1) +
+                    '-' + pad(d.getDate()) +
+                    'T' + pad(d.getHours()) +
+                    ':' + pad(d.getMinutes()) +
+                    ':' + pad(d.getSeconds())
+                );
+            };
+
+            formData.append('leaveType', leaveData.leaveType);
+            formData.append('startDate', formatDate(leaveData.startDate));
+            formData.append('endDate', formatDate(leaveData.endDate));
+
+            if (leaveData.reason) {
+                formData.append('reason', leaveData.reason);
             }
+
+            if (leaveData.files && leaveData.files.length > 0) {
+                formData.append('file', leaveData.files[0]);
+            }
+
             const data = await apiRequest('/api/v1/leaves/apply', {
                 method: 'POST',
-                body,
-                headers,
+                body: formData,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return data;
         } catch (err) {
@@ -220,4 +226,4 @@ const leaveSlice = createSlice({
     },
 });
 
-export default leaveSlice.reducer; 
+export default leaveSlice.reducer;

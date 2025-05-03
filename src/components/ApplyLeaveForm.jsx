@@ -14,9 +14,27 @@ const ApplyLeaveForm = ({ onSubmit, loading, error }) => {
     const [endDate, setEndDate] = useState('');
     const [reason, setReason] = useState('');
     const [files, setFiles] = useState([]);
+    const [fileError, setFileError] = useState('');
 
     const handleFileChange = (e) => {
-        setFiles(Array.from(e.target.files));
+        const selectedFiles = Array.from(e.target.files);
+
+        // Validate file size - optional, adjust to your requirements
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        const invalidFiles = selectedFiles.filter(file => file.size > maxSize);
+
+        if (invalidFiles.length > 0) {
+            setFileError('File size exceeds 5MB limit');
+            return;
+        }
+
+        if (selectedFiles.length > 1) {
+            setFileError('Note: Only the first file will be uploaded');
+        } else {
+            setFileError('');
+        }
+
+        setFiles(selectedFiles);
     };
 
     const handleSubmit = (e) => {
@@ -25,8 +43,7 @@ const ApplyLeaveForm = ({ onSubmit, loading, error }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
-            <h3 className="text-lg font-semibold text-blue-600 mb-2">Apply for Leave</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
             <div>
                 <label className="block text-gray-700 text-sm font-medium mb-1">Leave Type</label>
                 <select
@@ -73,14 +90,16 @@ const ApplyLeaveForm = ({ onSubmit, loading, error }) => {
                 />
             </div>
             <div>
-                <label className="block text-gray-700 text-sm font-medium mb-1">Supporting Documents</label>
+                <label className="block text-gray-700 text-sm font-medium mb-1">Supporting Document</label>
                 <input
                     type="file"
-                    multiple
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-700"
                     onChange={handleFileChange}
                 />
-                <div className="text-xs text-gray-400 mt-1">You can upload multiple files (PDF, images, etc.)</div>
+                <div className="text-xs text-gray-400 mt-1">
+                    Upload a supporting document (PDF, images, etc.). Maximum size: 5MB.
+                </div>
+                {fileError && <div className="text-xs text-amber-500 mt-1">{fileError}</div>}
             </div>
             {error && <div className="text-red-500 text-sm text-center">{error}</div>}
             <button
