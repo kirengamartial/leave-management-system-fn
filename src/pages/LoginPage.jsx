@@ -25,17 +25,6 @@ const LoginPage = () => {
         const roles = params.get('roles');
 
         if (token && userId && email) {
-            let rolesArray = roles;
-            if (typeof roles === 'string') {
-                try {
-                    rolesArray = JSON.parse(roles);
-                    if (!Array.isArray(rolesArray)) {
-                        rolesArray = [roles];
-                    }
-                } catch {
-                    rolesArray = roles.split(',').map(r => r.trim());
-                }
-            }
             dispatch(setUser({
                 user: {
                     userId,
@@ -44,7 +33,7 @@ const LoginPage = () => {
                     lastName,
                     department,
                     profilePicture,
-                    roles: rolesArray,
+                    roles: [roles],
                 },
                 token,
             }));
