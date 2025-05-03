@@ -4,8 +4,12 @@ const leaveTypes = [
     { value: '', label: 'Select Leave Type' },
     { value: 'ANNUAL', label: 'Annual Leave' },
     { value: 'SICK', label: 'Sick Leave' },
-    { value: 'CASUAL', label: 'Casual Leave' },
+    { value: 'MATERNITY', label: 'Maternity Leave' },
+    { value: 'PATERNITY', label: 'Paternity Leave' },
+    { value: 'BEREAVEMENT', label: 'Bereavement Leave' },
     { value: 'UNPAID', label: 'Unpaid Leave' },
+    { value: 'STUDY', label: 'Study Leave' },
+    { value: 'PERSONAL', label: 'Personal Leave' },
 ];
 
 const ApplyLeaveForm = ({ onSubmit, loading, error }) => {
