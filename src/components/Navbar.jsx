@@ -66,7 +66,7 @@ const Navbar = () => {
                                     <div>
                                         <button 
                                             className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            onClick={() => navigate('/profile')}
+                                           
                                         >
                                             <span className="sr-only">Open user menu</span>
                                             {user.profilePicture ? (
