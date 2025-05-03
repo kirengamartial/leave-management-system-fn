@@ -10,13 +10,15 @@ const RegisterPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [department, setDepartment] = useState('');
+    const [notification, setNotification] = useState('');
+    const [showNotification, setShowNotification] = useState(false);
+
     const dispatch = useAppDispatch();
     const { loading, error, token } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (token) {
-            toast.success('Registration successful!');
             navigate('/dashboard');
         }
     }, [token, navigate]);
@@ -27,19 +29,65 @@ const RegisterPage = () => {
         }
     }, [error]);
 
-    const handleSubmit = (e) => {
+    // Handle notification display and auto-dismiss
+    useEffect(() => {
+        if (notification) {
+            setShowNotification(true);
+            const timer = setTimeout(() => {
+                setShowNotification(false);
+                setTimeout(() => {
+                    setNotification('');
+                }, 300); // Clear message after fade out animation
+            }, 5000); // Show for 5 seconds
+
+            return () => clearTimeout(timer);
+        }
+    }, [notification]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(register({ firstName, lastName, email, password, department }));
+        try {
+            const resultAction = await dispatch(register({ firstName, lastName, email, password, department }));
+            if (register.fulfilled.match(resultAction)) {
+                setNotification(resultAction.payload.message);
+            } else {
+                toast.error('Something went wrong.');
+            }
+        } catch {
+            toast.error('Something went wrong.');
+        }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="w-full max-w-lg px-8 py-10 bg-white rounded-2xl shadow-xl">
-                <div className="mb-8 text-center">
+                <div className="mb-6 text-center">
                     <h1 className="text-3xl font-bold text-blue-600">Create your account</h1>
                     <p className="mt-2 text-sm text-gray-500">Join the Leave Management system</p>
                 </div>
-                
+
+                {/* Notification banner */}
+                {showNotification && (
+                    <div
+                        className={`mb-6 py-3 px-4 rounded-lg bg-green-50 border border-green-200 text-green-700 flex items-center justify-between transition-all duration-300 ${showNotification ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2'}`}
+                    >
+                        <div className="flex items-center">
+                            <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <p className="text-sm font-medium">{notification}</p>
+                        </div>
+                        <button
+                            onClick={() => setShowNotification(false)}
+                            className="text-green-600 hover:text-green-800 focus:outline-none"
+                        >
+                            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="flex gap-4">
                         <div className="w-1/2">
@@ -74,7 +122,7 @@ const RegisterPage = () => {
                             />
                         </div>
                     </div>
-                    
+
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1">Email address</label>
                         <div className="relative">
@@ -95,7 +143,7 @@ const RegisterPage = () => {
                             />
                         </div>
                     </div>
-                    
+
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-1">Password</label>
                         <div className="relative">
@@ -115,7 +163,7 @@ const RegisterPage = () => {
                             />
                         </div>
                     </div>
-                    
+
                     <div>
                         <label htmlFor="department" className="block text-sm font-medium text-gray-600 mb-1">Department</label>
                         <div className="relative">
@@ -137,7 +185,7 @@ const RegisterPage = () => {
                     </div>
 
                     {error && <div className="py-2 px-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200">{error}</div>}
-                    
+
                     <button
                         type="submit"
                         className="w-full py-2.5 px-4 bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-200 text-white font-medium rounded-lg transition duration-200"
@@ -154,7 +202,7 @@ const RegisterPage = () => {
                         ) : 'Create Account'}
                     </button>
                 </form>
-                
+
                 <p className="mt-8 text-center text-sm text-gray-600">
                     Already have an account?{' '}
                     <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
