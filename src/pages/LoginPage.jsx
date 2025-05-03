@@ -25,7 +25,17 @@ const LoginPage = () => {
         const roles = params.get('roles');
 
         if (token && userId && email) {
-            // Store all user info in Redux as flat fields
+            let rolesArray = roles;
+            if (typeof roles === 'string') {
+                try {
+                    rolesArray = JSON.parse(roles);
+                    if (!Array.isArray(rolesArray)) {
+                        rolesArray = [roles];
+                    }
+                } catch {
+                    rolesArray = roles.split(',').map(r => r.trim());
+                }
+            }
             dispatch(setUser({
                 user: {
                     userId,
@@ -34,7 +44,7 @@ const LoginPage = () => {
                     lastName,
                     department,
                     profilePicture,
-                    roles,
+                    roles: rolesArray,
                 },
                 token,
             }));
@@ -87,7 +97,7 @@ const LoginPage = () => {
                     <h1 className="text-3xl font-bold text-blue-600">Welcome back</h1>
                     <p className="mt-2 text-sm text-gray-500">Sign in to your Leave Management account</p>
                 </div>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1">Email address</label>
@@ -109,7 +119,7 @@ const LoginPage = () => {
                             />
                         </div>
                     </div>
-                    
+
                     <div>
                         <div className="flex items-center justify-between mb-1">
                             <label htmlFor="password" className="block text-sm font-medium text-gray-600">Password</label>
@@ -136,7 +146,7 @@ const LoginPage = () => {
                     </div>
 
                     {error && <div className="py-2 px-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200">{error}</div>}
-                    
+
                     <button
                         type="submit"
                         className="w-full py-2.5 px-4 bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-200 text-white font-medium rounded-lg transition duration-200"
@@ -153,7 +163,7 @@ const LoginPage = () => {
                         ) : 'Sign In'}
                     </button>
                 </form>
-                
+
                 <div className="mt-6 mb-6 relative">
                     <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-gray-300"></div>
@@ -162,7 +172,7 @@ const LoginPage = () => {
                         <span className="px-2 bg-white text-gray-500">Or continue with</span>
                     </div>
                 </div>
-                
+
                 <button
                     onClick={handleGoogleLogin}
                     className="w-full flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-600 hover:bg-gray-50 font-medium transition duration-200"
@@ -188,7 +198,7 @@ const LoginPage = () => {
                         </>
                     )}
                 </button>
-                
+
                 <p className="mt-8 text-center text-sm text-gray-500">
                     Don't have an account?{' '}
                     <Link to="/register" className="font-medium text-blue-500 hover:text-blue-400">
