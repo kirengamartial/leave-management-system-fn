@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { useNavigate } from 'react-router-dom';
 import ApplyLeaveForm from '../components/ApplyLeaveForm';
 import LeaveBalance from '../components/LeaveBalance';
 import LeaveHistory from '../components/LeaveHistory';
-import Navbar from '../components/Navbar';
 import { applyForLeave, fetchLeaveBalance, fetchLeaveHistory } from '../features/leave/leaveSlice';
 import toast from 'react-hot-toast';
 
 const DashboardPage = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const { user } = useAppSelector((state) => state.auth);
     const leave = useAppSelector((state) => state.leave);
 
@@ -37,13 +34,13 @@ const DashboardPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-blue-600">Welcome back, {user?.firstName}!</h1>
                     <p className="mt-1 text-sm text-gray-600">Manage your leave applications and view your leave balance</p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Leave Balance Card */}
                     <div className="col-span-1">
@@ -61,7 +58,7 @@ const DashboardPage = () => {
                             />
                         </div>
                     </div>
-                    
+
                     {/* Apply Leave Form Card */}
                     <div className="col-span-1 lg:col-span-2">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -78,7 +75,7 @@ const DashboardPage = () => {
                             />
                         </div>
                     </div>
-                    
+
                     {/* Leave History Card */}
                     <div className="col-span-1 lg:col-span-3">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
