@@ -9,7 +9,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [googleLoading, setGoogleLoading] = useState(false);
     const dispatch = useAppDispatch();
-    const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth);
+    const { loading, error, isAuthenticated, user } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -44,9 +44,12 @@ const LoginPage = () => {
     }, [location.search, dispatch, navigate]);
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (user && user.roles && user.roles.includes('STAFF')) {
             toast.success('Login successful!');
             navigate('/dashboard');
+        } else if (user && user.roles && user.roles.includes('ADMIN')) {
+            toast.success('Login successful!');
+            navigate('/admin');
         }
     }, [isAuthenticated, navigate]);
 
