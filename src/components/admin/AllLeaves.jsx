@@ -10,12 +10,20 @@ const AllLeaves = () => {
         leaveTypeId: '',
     });
     const [employees, setEmployees] = useState([]);
-    const [leaveTypes, setLeaveTypes] = useState([]);
+    const leaveTypes = [
+        { value: '', label: 'Select Leave Type' },
+        { value: 'ANNUAL', label: 'Annual Leave' },
+        { value: 'SICK', label: 'Sick Leave' },
+        { value: 'MATERNITY', label: 'Maternity Leave' },
+        { value: 'PATERNITY', label: 'Paternity Leave' },
+        { value: 'BEREAVEMENT', label: 'Bereavement Leave' },
+        { value: 'UNPAID', label: 'Unpaid Leave' },
+        { value: 'STUDY', label: 'Study Leave' },
+        { value: 'PERSONAL', label: 'Personal Leave' },
+    ];
 
     useEffect(() => {
         fetchLeaves();
-        fetchEmployees();
-        fetchLeaveTypes();
     }, [filters]);
 
     const fetchLeaves = async () => {
@@ -41,35 +49,7 @@ const AllLeaves = () => {
         }
     };
 
-    const fetchEmployees = async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/leaves/admin/employees`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            if (!response.ok) throw new Error('Failed to fetch employees');
-            const data = await response.json();
-            setEmployees(data);
-        } catch (error) {
-            toast.error('Failed to load employees');
-        }
-    };
 
-    const fetchLeaveTypes = async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/leaves/admin/types`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            if (!response.ok) throw new Error('Failed to fetch leave types');
-            const data = await response.json();
-            setLeaveTypes(data);
-        } catch (error) {
-            toast.error('Failed to load leave types');
-        }
-    };
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -115,30 +95,7 @@ const AllLeaves = () => {
             {/* Filters */}
             <div className="bg-white rounded-lg p-4 border border-gray-100">
                 <h3 className="text-lg font-medium text-gray-700 mb-4">Filters</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-1">Employee</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <select
-                                name="employeeId"
-                                value={filters.employeeId}
-                                onChange={handleFilterChange}
-                                className="pl-10 w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-600 bg-white"
-                            >
-                                <option value="">All Employees</option>
-                                {employees.map((employee) => (
-                                    <option key={employee.id} value={employee.id}>
-                                        {employee.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                     <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Leave Type</label>
@@ -156,8 +113,8 @@ const AllLeaves = () => {
                             >
                                 <option value="">All Types</option>
                                 {leaveTypes.map((type) => (
-                                    <option key={type.id} value={type.id}>
-                                        {type.name}
+                                    <option key={type.value} value={type.value}>
+                                        {type.label}
                                     </option>
                                 ))}
                             </select>
