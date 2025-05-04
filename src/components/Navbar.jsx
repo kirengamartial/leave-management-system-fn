@@ -11,6 +11,7 @@ const Navbar = () => {
     const { user, token } = useSelector((state) => state.auth);
     const isAuthenticated = !!user && !!token;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -25,8 +26,29 @@ const Navbar = () => {
             : 'text-gray-600 hover:text-blue-600 hover:border-b-2 hover:border-blue-300';
     };
 
+    // Function to render profile picture or default avatar
+    const renderProfilePicture = () => {
+        if (user?.profilePicture) {
+            return (
+                <img
+                    src={user.profilePicture}
+                    alt="Profile"
+                    className="h-8 w-8 rounded-full object-cover border border-gray-100"
+                />
+            );
+        }
+
+        return (
+            <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                <span className="font-medium text-sm">
+                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                </span>
+            </div>
+        );
+    };
+
     return (
-        <nav className="bg-white shadow-md">
+        <nav className="bg-white">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
@@ -69,17 +91,49 @@ const Navbar = () => {
                                     </Link>
                                 )}
                                 <div className="border-l border-gray-200 h-6 mx-2"></div>
-                                <div className="flex items-center">
-                                    <span className="text-gray-700 font-medium">{user.firstName}</span>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="ml-6 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors px-4 py-2 rounded-md text-sm font-medium flex items-center"
+
+                                {/* Profile dropdown */}
+                                <div className="relative">
+                                    <div
+                                        className="flex items-center space-x-2 rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-50 px-2 py-1"
+                                        onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && setShowProfileDropdown(!showProfileDropdown)}
                                     >
-                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                        </svg>
-                                        Logout
-                                    </button>
+                                        {renderProfilePicture()}
+                                        <div className="flex items-center">
+                                            <span className="text-gray-700 font-medium ml-2">{user?.firstName}</span>
+                                            <svg className="ml-1 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    {/* Dropdown menu */}
+                                    {showProfileDropdown && (
+                                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md py-1 z-10 shadow-lg border border-gray-100">
+
+                                            <div className="border-t border-gray-100 my-1"></div>
+                                            <div
+                                                onClick={() => {
+                                                    handleLogout();
+                                                    setShowProfileDropdown(false);
+                                                }}
+                                                className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 cursor-pointer"
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handleLogout();
+                                                        setShowProfileDropdown(false);
+                                                    }
+                                                }}
+                                            >
+                                                Sign out
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ) : (
@@ -92,7 +146,7 @@ const Navbar = () => {
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm"
+                                    className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 hover:from-blue-600 hover:to-blue-800"
                                 >
                                     Create Account
                                 </Link>
@@ -102,9 +156,13 @@ const Navbar = () => {
 
                     {/* Mobile menu button */}
                     <div className="flex items-center md:hidden">
-                        <button
+                        <div
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-blue-600 hover:bg-blue-50 focus:outline-none transition-colors duration-200 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && setIsMenuOpen(!isMenuOpen)}
+                            aria-label="Open main menu"
                         >
                             <span className="sr-only">Open main menu</span>
                             {!isMenuOpen ? (
@@ -116,7 +174,7 @@ const Navbar = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             )}
-                        </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -127,11 +185,20 @@ const Navbar = () => {
                     <div className="px-3 pt-2 pb-3 space-y-1">
                         {isAuthenticated ? (
                             <>
-                                <div className="px-4 py-3 border-b border-gray-200">
-                                    <div className="text-base font-medium text-gray-800">
-                                        {user.firstName} {user.lastName}
+                                <div className="px-4 py-3 border-b border-gray-100 flex items-center">
+                                    {renderProfilePicture()}
+                                    <div className="ml-3">
+                                        <div className="text-base font-medium text-gray-700">
+                                            {user.firstName} {user.lastName}
+                                        </div>
+                                        <div className="text-sm font-medium text-gray-500">
+                                            {user.email}
+                                        </div>
                                     </div>
                                 </div>
+
+
+
                                 {user.roles && user.roles.includes('STAFF') && (
                                     <Link
                                         to="/dashboard"
@@ -162,19 +229,28 @@ const Navbar = () => {
                                         Admin
                                     </Link>
                                 )}
+                                <div className="border-t border-gray-200 my-1"></div>
                                 <div className="px-4 py-3">
-                                    <button
+                                    <div
                                         onClick={() => {
                                             handleLogout();
                                             setIsMenuOpen(false);
                                         }}
-                                        className="flex items-center w-full text-left text-gray-700 hover:text-gray-900 font-medium"
+                                        className="flex items-center w-full text-left text-gray-700 hover:text-blue-600 font-medium cursor-pointer transition-colors duration-200"
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleLogout();
+                                                setIsMenuOpen(false);
+                                            }
+                                        }}
                                     >
                                         <svg className="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                         </svg>
                                         Sign out
-                                    </button>
+                                    </div>
                                 </div>
                             </>
                         ) : (
@@ -189,7 +265,7 @@ const Navbar = () => {
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white block px-4 py-3 rounded-md text-base font-medium my-2 mx-4"
+                                    className="bg-gradient-to-r from-blue-500 to-blue-700 text-white block px-4 py-3 rounded-md text-base font-medium my-2 mx-4 shadow-md"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Create Account
